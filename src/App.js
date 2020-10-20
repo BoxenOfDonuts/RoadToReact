@@ -46,33 +46,42 @@ const App = () => {
   );
 };
 
-const Search = (props) => (
+// same as List, deconstruct w/ {}
+// otherwise const Search = props => {
+//  const { search, onSearch } = props 
+//}
+const Search = ({ search, onSearch }) => {
+  return(
       <div>
           <label htmlFor="search">Search: </label>
           <input
             id="search"
             type="text"
-            value={props.search}
-            onChange={props.onSearch}
+            value={search}
+            onChange={onSearch}
           />
           <p>
-            Searching for <strong>{props.search}</strong>
+            Searching for <strong>{search}</strong>
           </p>
       </div> 
-);
+  );
+};
 
 // instead of using props I can deconstruct w/ the {} in the declaration
 // const List = list => and props.map.(item => ) is the other way
 const List = ({list}) =>
-  list.map(item => (
-    <div key={item.objectID}>
-      <span>
-        <a href={item.url}>{item.title}</a>
-      </span>
-      <span>{item.author}</span>
-      <span>{item.num_comments}</span>
-      <span>{item.points}</span>
-    </div>
-  ));
+  // spread on left side of an assignment, spread on the right
+  list.map(({objectID, ...item}) => < Item key={item.objectID} {...item} />);
+   
+const Item = ({ title, url, author, num_comments, points }) => (
+  <div>
+    <span>
+      <a href={url}>{title}</a>
+    </span>
+    <span>{author}</span>
+    <span>{num_comments}</span>
+    <span>{points}</span>
+  </div>
+);
 
 export default App;
