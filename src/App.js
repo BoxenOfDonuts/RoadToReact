@@ -1,7 +1,5 @@
 import React from 'react';
 
-// same as below but w/ arrows 
-
 const App = () => {
   const stories = [
     {
@@ -21,39 +19,47 @@ const App = () => {
       objectID: 1,
     },
   ];
+  // array deconstructing
+  // useStat() returns those two vars, which is why we deconstruct it
+  // searchTerm is current stae, setSearchTerm is a functiion to UPDATE state
+  const [searchTerm, setSearchTerm] = React.useState('React');
 
-  const handlChange = event => {
-    console.log(event.target.value);
+  // A
+  const handleSearch = event => {
+    // C
+    setSearchTerm(event.target.value);
   };
+
+  const searchedStories = stories.filter(story =>
+    story.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div>
       <h1>My Hacker Stories</h1>
-
-      <label htmlFor="search">Search: </label>
-      <input id="search" type="text" onChange={handlChange} />
+      
+      <Search search={searchTerm} onSearch={handleSearch}/>
 
       <hr />
-      <List list={stories} />
+      <List list={searchedStories} />
     </div>
   );
 };
 
-/*
-function App() {
-  return (
-    <div>
-      <h1>My Hacker Stories</h1>
-
-      <label htmlFor="search">Search: </label>
-      <input id="search" type="text" />
-
-      <hr />
-      <List />
-      <List />
-    </div>
-  );
-}
-*/
+const Search = (props) => (
+      <div>
+          <label htmlFor="search">Search: </label>
+          <input
+            id="search"
+            type="text"
+            value={props.search}
+            onChange={props.onSearch}
+          />
+          <p>
+            Searching for <strong>{props.search}</strong>
+          </p>
+      </div> 
+);
 
 // instead of using props I can deconstruct w/ the {} in the declaration
 // const List = list => and props.map.(item => ) is the other way
