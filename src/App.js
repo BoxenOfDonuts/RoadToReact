@@ -1,5 +1,17 @@
 import React from 'react';
 
+const useSemiPersistentState = (key, initialState) => {
+  const [value, setValue] = React.useState(
+    localStorage.getItem(key) || initialState
+  );
+
+  React.useEffect(() => {
+    localStorage.setItem(key, value);
+  }, [value, key]);
+
+  return [value, setValue];
+};
+
 const App = () => {
   const stories = [
     {
@@ -22,11 +34,12 @@ const App = () => {
   // array deconstructing
   // useStat() returns those two vars, which is why we deconstruct it
   // searchTerm is current stae, setSearchTerm is a functiion to UPDATE state
-  const [searchTerm, setSearchTerm] = React.useState('React');
+  const [searchTerm, setSearchTerm] = useSemiPersistentState(
+    'search',
+    'React'
+    );
 
-  // A
   const handleSearch = event => {
-    // C
     setSearchTerm(event.target.value);
   };
 
@@ -37,50 +50,76 @@ const App = () => {
   return (
     <div>
       <h1>My Hacker Stories</h1>
-      
-      <Search search={searchTerm} onSearch={handleSearch}/>
 
+      <InputWithLabel
+        id="search"
+        label="Search"
+        value={searchTerm}
+        type="text"
+        onInputChange={handleSearch}      
+      >
+        <strong>Search:</strong>
+        </InputWithLabel>
       <hr />
       <List list={searchedStories} />
     </div>
   );
 };
 
+const InputWithLabel = ({
+  id,
+  label,
+  value, 
+  type='text',
+  onInputChange,
+  children
+}) => (
+  <>
+    <label htmlFor={id}>{children}</label>
+    &nbsp;
+    <input
+      id={id}
+      type={type}
+      value={value}
+      onChange={onInputChange}
+    />
+  </>
+
+);
+
 // same as List, deconstruct w/ {}
 // otherwise const Search = props => {
 //  const { search, onSearch } = props 
 //}
-const Search = ({ search, onSearch }) => {
-  return(
-      <div>
-          <label htmlFor="search">Search: </label>
-          <input
-            id="search"
-            type="text"
-            value={search}
-            onChange={onSearch}
-          />
-          <p>
-            Searching for <strong>{search}</strong>
-          </p>
-      </div> 
-  );
-};
+const Search = ({ search, onSearch }) => (
+  <>
+    <label htmlFor="search">Search: </label>
+    <input
+      id="search"
+      type="text"
+      value={search}
+      onChange={onSearch}
+    />
+    <p>
+      Searching for <strong>{search}</strong>
+    </p>
+  </>
+);
 
 // instead of using props I can deconstruct w/ the {} in the declaration
 // const List = list => and props.map.(item => ) is the other way
 const List = ({list}) =>
   // spread on left side of an assignment, spread on the right
-  list.map(({objectID, ...item}) => < Item key={item.objectID} {...item} />);
+  list.map(item => < Item key={item.objectID} item={item}/>);
    
-const Item = ({ title, url, author, num_comments, points }) => (
+const Item = ({ item }) => (
   <div>
     <span>
-      <a href={url}>{title}</a>
+      <a href={item.url}>{item.title}</a>
     </span>
-    <span>{author}</span>
-    <span>{num_comments}</span>
-    <span>{points}</span>
+    <span>{item.author}</span>
+    <span>{item.num_comments}</span>
+    <span>{item.points}</span>
   </div>
 );
 
